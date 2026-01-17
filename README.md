@@ -235,10 +235,18 @@ Compétences :
 
 ---
 
-## 📄 License
+## 📄 Licences
 
-Ce projet est sous licence MIT.  
-Le dataset PTB-XL est sous licence ODC-ODbL.
+### Code Source (Scripts, Modèle)
+Ce projet est sous licence **MIT** - libre d'utilisation, modification et distribution.
+
+### Dataset PTB-XL
+Le dataset PTB-XL est sous licence **Creative Commons Attribution 4.0 (CC BY 4.0)**.
+
+**Citation obligatoire** :
+> Wagner, P., Strodthoff, N., Bousseljot, R., et al. (2020). PTB-XL, a large publicly available electrocardiography dataset. Scientific Data, 7(1), 154. https://doi.org/10.1038/s41597-020-0495-6
+
+**Source** : https://physionet.org/content/ptb-xl/1.0.3/
 
 ---
 
