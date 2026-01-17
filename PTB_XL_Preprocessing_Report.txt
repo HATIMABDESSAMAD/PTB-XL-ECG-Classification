@@ -1,0 +1,176 @@
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    RAPPORT DE PREPROCESSING PROFESSIONNEL                     ║
+║                         PTB-XL ECG Database v1.0.3                            ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Date: 2025-12-29 18:10:36
+
+═══════════════════════════════════════════════════════════════════════════════
+1. RÉSUMÉ DU PIPELINE
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ ÉTAPE 1: Chargement des données
+  • Dataset original: 21,799 enregistrements
+
+✓ ÉTAPE 2: Nettoyage des outliers
+  • Outliers supprimés: 318
+  • Dataset après nettoyage: 21,481 enregistrements
+
+✓ ÉTAPE 3: Feature Engineering
+  • Nouvelles features créées: 13
+  • Features incluant: BMI, groupes d'âge, features temporelles, scores qualité
+
+✓ ÉTAPE 4: Encodage multi-label
+  • Top 30 codes SCP encodés
+  • 5 superclasses diagnostiques créées
+
+✓ ÉTAPE 5: Imputation des valeurs manquantes
+  • Height: KNN Imputation (K=5)
+  • Weight: KNN Imputation (K=5)
+  • Heart Axis: Mode conditionnel (par sexe/âge)
+  • Réduction totale: 42.9%
+
+✓ ÉTAPE 6: Encodage catégoriel
+  • Age groups: One-Hot Encoding
+  • BMI categories: One-Hot Encoding
+  • Site & Device: Label Encoding
+  • Heart Axis: Label Encoding
+
+✓ ÉTAPE 7: Filtrage qualité
+  • Dataset complet: 21,481
+  • Dataset haute qualité: 0 (0.0%)
+
+✓ ÉTAPE 8: Normalisation
+  • 9 features numériques normalisées
+  • Méthode: RobustScaler (résistant outliers)
+
+✓ ÉTAPE 9: Nettoyage colonnes
+  • 13 colonnes inutiles supprimées
+  • Conservées: filename_lr, filename_hr (pour signaux ECG)
+
+✓ ÉTAPE 10: Sélection features
+  • Total features ML: 70
+  • Features finales: 85 colonnes
+
+✓ ÉTAPE 11: Split Train/Val/Test
+  • Train: 17,182 (80.0%)
+  • Validation: 2,137 (9.9%)
+  • Test: 2,162 (10.1%)
+
+✓ ÉTAPE 12: Sauvegarde
+  • 8 fichiers CSV générés
+
+═══════════════════════════════════════════════════════════════════════════════
+2. CARACTÉRISTIQUES DES DATASETS
+═══════════════════════════════════════════════════════════════════════════════
+
+DATASET COMPLET
+───────────────
+• Enregistrements: 21,481
+• Features totales: 85
+• Features ML: 70
+
+DATASET HAUTE QUALITÉ
+─────────────────────
+• Enregistrements: 0
+• Critères: quality_score >= 5 ET validé par humain
+• Utilisation: Entraînement de modèles haute précision
+
+SPLITS TRAIN/VAL/TEST
+──────────────────────
+• Stratification: Basée sur strat_fold existant
+• Distribution équilibrée des classes diagnostiques
+• Prêt pour validation croisée
+
+═══════════════════════════════════════════════════════════════════════════════
+3. FEATURES DISPONIBLES POUR ML
+═══════════════════════════════════════════════════════════════════════════════
+
+DÉMOGRAPHIQUES (5)
+────────────────
+age, sex, height, weight, bmi
+
+TEMPORELLES (4)
+───────────
+year, month, quarter, day_of_week
+
+QUALITÉ (11)
+───────
+quality_score, quality_issues_count, has_quality_issues, baseline_drift, static_noise... (+6 autres)
+
+CODES SCP (35)
+─────────
+scp_SR, scp_NORM, scp_ABQRS, scp_IMI, scp_ASMI, scp_LVH, scp_NDT, scp_LAFB, scp_AFIB, scp_ISC_... (+25 autres)
+
+═══════════════════════════════════════════════════════════════════════════════
+4. RECOMMANDATIONS POUR LA MODÉLISATION
+═══════════════════════════════════════════════════════════════════════════════
+
+DATASETS À UTILISER
+───────────────────
+✓ ptbxl_preprocessed_train.csv - Entraînement
+✓ ptbxl_preprocessed_val.csv - Validation/tuning hyperparamètres
+✓ ptbxl_preprocessed_test.csv - Évaluation finale
+
+FEATURES À UTILISER
+───────────────────
+✓ ptbxl_ml_features_*.csv - Features ML sélectionnées uniquement
+
+GESTION DÉSÉQUILIBRE
+─────────────────────
+• Classes déséquilibrées identifiées (ex: NORM 43.6% vs codes rares <5%)
+• Techniques suggérées:
+  1. Class weights (class_weight='balanced')
+  2. SMOTE pour oversampling minoritaires
+  3. Random undersampling majoritaires
+  4. Stratified K-Fold validation
+
+MODÈLES RECOMMANDÉS
+───────────────────
+1. Random Forest / XGBoost (baseline solide)
+2. LightGBM (rapide, performant)
+3. Neural Networks (classification multi-label)
+4. Ensemble methods (stacking/blending)
+
+MÉTRIQUES D'ÉVALUATION
+──────────────────────
+• Multi-label: ROC-AUC, F1-score macro/micro, Hamming Loss
+• Par classe: Precision, Recall, F1
+• Matrices de confusion par code diagnostic
+
+═══════════════════════════════════════════════════════════════════════════════
+5. FICHIERS GÉNÉRÉS
+═══════════════════════════════════════════════════════════════════════════════
+
+DATASETS COMPLETS
+─────────────────
+✓ ptbxl_preprocessed_complete.csv - Toutes les données preprocessed
+✓ ptbxl_preprocessed_high_quality.csv - Haute qualité uniquement
+✓ ptbxl_preprocessed_train.csv - Set d'entraînement
+✓ ptbxl_preprocessed_val.csv - Set de validation
+✓ ptbxl_preprocessed_test.csv - Set de test
+
+DATASETS ML (FEATURES SÉLECTIONNÉES)
+────────────────────────────────────
+✓ ptbxl_ml_features_train.csv - Features ML train
+✓ ptbxl_ml_features_val.csv - Features ML validation
+✓ ptbxl_ml_features_test.csv - Features ML test
+
+═══════════════════════════════════════════════════════════════════════════════
+6. PROCHAINES ÉTAPES
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Analyse exploratoire post-preprocessing
+2. Feature importance analysis
+3. Développement modèles baseline
+4. Tuning hyperparamètres
+5. Évaluation et comparaison modèles
+6. Interprétabilité (SHAP, LIME)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Pipeline preprocessing exécuté avec succès ! ✓
+Données prêtes pour le Machine Learning.
+
+═══════════════════════════════════════════════════════════════════════════════

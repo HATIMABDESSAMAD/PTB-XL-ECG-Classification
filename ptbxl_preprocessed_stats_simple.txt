@@ -1,0 +1,21 @@
+================================================================================
+STATISTIQUES PREPROCESSING PTB-XL
+================================================================================
+
+Date: 2025-12-29 15:03:02
+
+Enregistrements initiaux: 21,799
+Enregistrements finaux: 21,799
+Outliers traités: 317
+Features créées: 51
+Valeurs manquantes: 180272
+
+Top 10 features créées:
+  1. bmi
+  2. age_group
+  3. age_sex_interaction
+  4. year
+  5. month
+  6. day_of_week
+  7. is_weekend
+  9. num_diagnoses

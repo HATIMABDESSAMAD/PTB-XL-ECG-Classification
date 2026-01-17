@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Large data files (too big for GitHub)
+records100/
+records500/
+cleaned_signals_100hz/
+preprocessed_wide/
+*.npz
+*.dat
+*.hea
+
+# CSV data files (large)
+ptbxl_database.csv
+ptbxl_preprocessed_*.csv
+ptbxl_with_*.csv
+ptbxl_ml_features_*.csv
+ptbxl_from_excel_*.csv
+ptbxl_wide_features.csv
+
+# Model files (can be large)
+*.pth
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,151 @@
+
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    RAPPORT D'ANALYSE DES DÉPENDANCES                          ║
+║                  Codes SCP (Maladies) vs Variables PTB-XL                     ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+Date: 2025-12-29 14:29:16
+
+═══════════════════════════════════════════════════════════════════════════════
+1. RÉSUMÉ EXÉCUTIF
+═══════════════════════════════════════════════════════════════════════════════
+
+Cette analyse examine les dépendances entre les 20 codes SCP les plus 
+fréquents et les variables démographiques, anthropométriques, temporelles et de 
+qualité du dataset PTB-XL.
+
+Dataset analysé: 21,799 enregistrements ECG
+
+═══════════════════════════════════════════════════════════════════════════════
+2. PRINCIPALES DÉCOUVERTES
+═══════════════════════════════════════════════════════════════════════════════
+
+🔍 DÉPENDANCE AVEC L'ÂGE
+───────────────────────
+
+Codes avec différences d'âge les plus marquées:
+Code  Age_Moyen_Avec  Age_Moyen_Sans  Difference Significatif
+STD_       81.463826       61.862001   19.601825          ***
+AFIB       79.773448       61.500173   18.273275          ***
+NST_       77.770535       62.222233   15.548302          ***
+1AVB       77.451450       62.215034   15.236416          ***
+LAFB       76.592730       61.657316   14.935414          ***
+
+→ 19 codes sur 20 montrent une 
+  association significative avec l'âge (p<0.05)
+
+🚻 DÉPENDANCE AVEC LE SEXE
+───────────────────────────
+
+Codes avec différences de prévalence les plus marquées:
+Code  Prevalence_Femmes  Prevalence_Hommes  Difference Significatif
+NORM          38.629558          49.095261   10.465703          ***
+STD_           3.470143           5.887985    2.417842          ***
+  SR          75.770654          77.979895    2.209241          ***
+ NDT           7.398274           9.430349    2.032076          ***
+NST_           2.677470           4.432743    1.755272          ***
+
+→ 18 codes sur 20 montrent des 
+  différences significatives entre sexes (p<0.05)
+
+⚖️  DÉPENDANCE AVEC L'ANTHROPOMÉTRIE
+──────────────────────────────────
+
+Codes avec associations significatives:
+• Poids: 9 codes sur 10
+• Taille: 6 codes sur 10
+• IMC: 9 codes sur 10
+
+📅 ÉVOLUTION TEMPORELLE
+───────────────────────
+
+Tendances observées sur la période 1984-2001:
+• Augmentation de prévalence: NORM, SR
+• Diminution de prévalence: certains codes d'infarctus
+• Stabilité: codes de troubles du rythme
+
+🎯 QUALITÉ DU SIGNAL
+────────────────────
+
+Associations qualité-codes:
+• 10 codes analysés
+• Certains codes associés à plus de problèmes de signal
+• Impact variable selon le type de pathologie
+
+🔗 CO-OCCURRENCES
+─────────────────
+
+Top 5 paires de codes les plus associés:
+Code1 Code2  Cooccurrence
+  LVH  ISC_     54.831144
+   SR  NORM     48.984953
+ABQRS   IMI     44.394349
+ABQRS  ASMI     34.866246
+  LVH VCLVH     30.628518
+
+Nombre moyen de codes par enregistrement: 2.80
+
+═══════════════════════════════════════════════════════════════════════════════
+3. IMPLICATIONS CLINIQUES ET POUR LE MACHINE LEARNING
+═══════════════════════════════════════════════════════════════════════════════
+
+FEATURES IMPORTANTES POUR LA PRÉDICTION
+────────────────────────────────────────
+
+✓ ÂGE: Variable fortement discriminante
+  → Intégrer comme feature principale dans les modèles ML
+
+✓ SEXE: Associations significatives pour plusieurs codes
+  → Considérer des modèles stratifiés par sexe ou interaction âge×sexe
+
+✓ QUALITÉ DU SIGNAL: Impact sur certains diagnostics
+  → Filtrer ou normaliser selon la qualité avant modélisation
+
+✓ CO-OCCURRENCES: Patterns complexes multi-label
+  → Envisager des architectures ML multi-output ou chain classifiers
+
+RECOMMANDATIONS POUR LA MODÉLISATION
+─────────────────────────────────────
+
+1. FEATURE ENGINEERING
+   • Créer des interactions âge×sexe
+   • Inclure des features de qualité du signal
+   • Considérer les patterns temporels
+
+2. ARCHITECTURE ML
+   • Multi-label classification (sklearn.multioutput)
+   • Modèles avec gestion des déséquilibres
+   • Ensemble methods pour capturer les interactions
+
+3. VALIDATION
+   • Stratification par âge ET sexe
+   • Attention aux biais temporels
+   • Validation externe sur différentes périodes
+
+4. INTERPRÉTABILITÉ
+   • SHAP values pour importance des features
+   • Attention aux corrélations âge-codes
+   • Analyse des erreurs par sous-groupes
+
+═══════════════════════════════════════════════════════════════════════════════
+4. LIMITATIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+• Données anthropométriques incomplètes (>50% manquantes)
+• Distribution temporelle non uniforme
+• Certains codes rares (n<100) → puissance statistique limitée
+• Possible biais de sélection (centres hospitaliers)
+
+═══════════════════════════════════════════════════════════════════════════════
+5. FICHIERS GÉNÉRÉS
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Dependances_01_Age_Codes.png
+✓ Dependances_02_Sexe_Codes.png
+✓ Dependances_03_Anthropometrie_Codes.png
+✓ Dependances_04_Temporel_Codes.png
+✓ Dependances_05_Qualite_Codes.png
+✓ Dependances_06_Cooccurrences.png
+✓ Rapport_Dependances_Maladies.txt (ce fichier)
+
+═══════════════════════════════════════════════════════════════════════════════

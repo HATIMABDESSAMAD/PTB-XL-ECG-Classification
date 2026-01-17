@@ -1,0 +1,23 @@
+{
+  "config": {
+    "task_mode": "5superclass",
+    "wide_features": "all_features_engineered",
+    "wide_input_dim": 122,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "dropout": 0.1
+  },
+  "results": {
+    "best_epoch": 4,
+    "val_auc_macro": 0.8951270141055072,
+    "test_auc_macro": 0.8982695917971926,
+    "test_auc_micro": 0.9190044185035813,
+    "test_auc_per_class": [
+      0.9304049671022148,
+      0.9038423586040913,
+      0.8677096905739947,
+      0.9324445398987365,
+      0.8569464028069254
+    ]
+  }
+}

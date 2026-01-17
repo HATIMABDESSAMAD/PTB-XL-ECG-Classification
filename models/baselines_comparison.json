@@ -1,0 +1,27 @@
+[
+  {
+    "name": "XGBoost (Wide only)",
+    "val_auc_macro": 0.8996452887992987,
+    "val_auc_micro": 0.9223249804573905,
+    "test_auc_macro": 0.9033959071120737,
+    "test_auc_micro": 0.9243380210710863
+  },
+  {
+    "name": "Deep only (CNN+Transformer)",
+    "val_auc_macro": 0.8652615772361228,
+    "test_auc_macro": 0.8661236893885261,
+    "test_auc_micro": 0.8938017342605027
+  },
+  {
+    "name": "Wide only (MLP)",
+    "val_auc_macro": 0.9028245040556158,
+    "test_auc_macro": 0.9036014276978166,
+    "test_auc_micro": 0.9228686651089787
+  },
+  {
+    "name": "Wide+Deep (122 feat)",
+    "val_auc_macro": 0.8951270141055072,
+    "test_auc_macro": 0.8982695917971926,
+    "test_auc_micro": 0.9190044185035813
+  }
+]
