@@ -1,350 +1,247 @@
-# 📊 Analyse Exploratoire de Données - PTB-XL ECG Dataset
+# 🫀 PTB-XL ECG Classification - Deep Learning
 
 [![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-Complete-success.svg)]()
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
+[![AUC](https://img.shields.io/badge/AUC-92%25-success.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
 
-> **Analyse exploratoire professionnelle du plus grand dataset public d'électrocardiogrammes (ECG)**
+> **Classification automatique d'ECG multi-label avec architecture Wide+Deep (CNN + Transformer)**
+
+![ROC Curves](roc_curves_FIXED_combined.png)
 
 ---
 
-## 🎯 À Propos
+## 🎯 Objectif du Projet
 
-Ce projet contient une **analyse exploratoire de données (EDA) complète et professionnelle** du dataset PTB-XL, comprenant :
+Développement d'un **système de classification automatique des électrocardiogrammes (ECG)** capable de détecter **5 pathologies cardiaques** à partir de signaux ECG 12 dérivations, avec une **AUC de 92%**.
 
-- ✅ **21,799 enregistrements ECG** analysés
-- ✅ **5 visualisations haute résolution** (300 DPI)
-- ✅ **3 rapports détaillés** (PDF/TXT/Markdown)
-- ✅ **2 scripts Python** (simple & professionnel)
-- ✅ **Documentation complète** en français
+### Classes Prédites
+
+| Classe | Description | AUC Test |
+|--------|-------------|----------|
+| **NORM** | ECG Normal | 94.4% |
+| **MI** | Infarctus du Myocarde | 93.2% |
+| **STTC** | Changements ST/T | 92.7% |
+| **CD** | Troubles de Conduction | 92.0% |
+| **HYP** | Hypertrophie | 87.6% |
+
+---
+
+## 📊 Dataset PTB-XL
+
+| Métrique | Valeur |
+|----------|--------|
+| **Enregistrements ECG** | 21,799 |
+| **Patients uniques** | 18,869 |
+| **Période de collecte** | 1984-2001 |
+| **Dérivations ECG** | 12 leads standard |
+| **Fréquences** | 100 Hz / 500 Hz |
+| **Codes diagnostiques** | 71 codes SCP |
+| **Score qualité moyen** | 5.64/6 ⭐ |
+
+---
+
+## 🏗️ Architecture du Modèle
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    WIDE+DEEP MODEL                              │
+│                  11,561,573 paramètres                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+        ┌─────────────────────┴─────────────────────┐
+        │                                           │
+┌───────▼───────┐                         ┌─────────▼─────────┐
+│  DEEP BRANCH  │                         │   WIDE BRANCH     │
+│  Signal ECG   │                         │ Features Cliniques│
+│  (12, 1000)   │                         │      (32)         │
+└───────┬───────┘                         └─────────┬─────────┘
+        │                                           │
+┌───────▼───────┐                         ┌─────────▼─────────┐
+│  CNN 1D       │                         │    MLP            │
+│  6 blocs      │                         │  64 → 32 neurons  │
+│  12→128→256   │                         └─────────┬─────────┘
+└───────┬───────┘                                   │
+        │                                           │
+┌───────▼───────┐                                   │
+│  Transformer  │                                   │
+│  8 layers     │                                   │
+│  8 heads      │                                   │
+└───────┬───────┘                                   │
+        │                                           │
+        └─────────────────┬─────────────────────────┘
+                          │
+                ┌─────────▼─────────┐
+                │     FUSION        │
+                │  Concatenation    │
+                │   96 → 128 → 5    │
+                └─────────┬─────────┘
+                          │
+                ┌─────────▼─────────┐
+                │     OUTPUT        │
+                │  5 probabilités   │
+                │ NORM MI STTC CD HYP│
+                └───────────────────┘
+```
+
+---
+
+## 📈 Performances
+
+### Comparaison des Modèles
+
+| Modèle | Val AUC | Test AUC Macro | Test AUC Micro |
+|--------|---------|----------------|----------------|
+| **Wide only (MLP)** | **90.28%** | **90.36%** | **92.29%** |
+| XGBoost (Wide) | 89.96% | 90.34% | 92.43% |
+| Wide+Deep | 89.51% | 89.83% | 91.90% |
+| Deep only | 86.53% | 86.61% | 89.38% |
+
+### Courbes ROC par Classe
+
+![ROC per Class](roc_curves_FIXED_per_class.png)
+
+---
+
+## 🚀 Installation & Utilisation
+
+### Prérequis
+
+```bash
+pip install pandas numpy scikit-learn
+pip install wfdb neurokit2
+pip install torch torchvision
+pip install xgboost tqdm
+```
+
+### Pipeline Complet (7 étapes)
+
+```bash
+# Step 1: Préparation des labels
+python step1_label_engineering.py
+
+# Step 2: Nettoyage des signaux ECG
+python step2_signal_cleaning.py
+
+# Step 3: Extraction features cliniques
+python step3_wide_features_extraction.py
+
+# Step 4: Preprocessing
+python step4_wide_preprocessing.py
+
+# Step 5: Test architecture
+python step5_wide_deep_model.py
+
+# Step 6: Entraînement
+python step6_training.py
+
+# Step 7: Comparaison baselines
+python step7_baselines.py
+```
+
+### Utilisation du Modèle (Inférence)
+
+```python
+# Script autonome pour prédiction
+python exemple_utilisation_format_ptbxl.py
+```
 
 ---
 
 ## 📁 Structure du Projet
 
 ```
-📦 ptb-xl-eda/
-├── 📊 VISUALISATIONS (PNG 300 DPI)
-│   ├── EDA_01_Demographics.png      # Analyses démographiques
-│   ├── EDA_02_Diagnostics.png       # Distribution des diagnostics
-│   ├── EDA_03_Temporal.png          # Évolutions temporelles
-│   ├── EDA_04_Quality.png           # Qualité des données
-│   └── EDA_05_Technical.png         # Infrastructure technique
+📦 PTB-XL-ECG-Classification/
 │
-├── 📄 RAPPORTS & DOCUMENTATION
-│   ├── SYNTHESE_EXECUTIVE.txt       # ⭐ Résumé exécutif
-│   ├── RESULTATS_ANALYSE.md         # Résultats détaillés
-│   ├── GUIDE_UTILISATION.md         # Guide pratique
-│   ├── PTB_XL_EDA_Report.txt        # Rapport complet
-│   └── INDEX.txt                    # Index des fichiers
+├── 🔧 PIPELINE ML
+│   ├── step1_label_engineering.py      # Préparation labels
+│   ├── step2_signal_cleaning.py        # Nettoyage signaux
+│   ├── step3_wide_features_extraction.py
+│   ├── step4_wide_preprocessing.py
+│   ├── step5_wide_deep_model.py        # Architecture PyTorch
+│   ├── step6_training.py               # Entraînement
+│   └── step7_baselines.py              # Comparaison modèles
 │
-├── 🐍 SCRIPTS PYTHON
-│   ├── PTB_XL_EDA_Simple.py         # ⭐ Version optimisée
-│   ├── PTB_XL_EDA_Professional.py   # Version complète
-│   ├── run_eda.py                   # Launcher
-│   └── requirements.txt             # Dépendances
+├── 📊 ANALYSE EDA
+│   ├── PTB_XL_EDA_Professional.py
+│   ├── EDA_01_Demographics.png
+│   ├── EDA_02_Diagnostics.png
+│   └── ...
 │
-└── 📋 DONNÉES SOURCE
-    ├── ptbxl_database.csv           # Dataset principal
-    ├── scp_statements.csv           # Codes diagnostiques
-    ├── records100/                  # Signaux 100Hz
-    └── records500/                  # Signaux 500Hz
+├── 📈 RÉSULTATS
+│   ├── models/baselines_comparison.csv
+│   ├── roc_curves_FIXED_combined.png
+│   ├── confusion_matrices_FIXED.png
+│   └── history_pure_FIXED.json
+│
+├── 📄 DOCUMENTATION
+│   ├── README.md
+│   ├── README_WIDE_DEEP_PIPELINE.md
+│   └── GUIDE_UTILISATION.md
+│
+└── 🎯 DÉPLOIEMENT
+    └── exemple_utilisation_format_ptbxl.py
 ```
 
 ---
 
-## 🚀 Démarrage Rapide
+## 🛠️ Technologies
 
-### Installation
-
-```bash
-# 1. Cloner ou télécharger le projet
-cd ptb-xl-eda
-
-# 2. Installer les dépendances
-pip install -r requirements.txt
-
-# 3. Lancer l'analyse
-python PTB_XL_EDA_Simple.py
-```
-
-### Consultation des Résultats
-
-1. **Commencez par** : `SYNTHESE_EXECUTIVE.txt` (résumé en 2 pages)
-2. **Puis consultez** : `RESULTATS_ANALYSE.md` (analyse détaillée)
-3. **Visualisez** : Les 5 graphiques PNG générés
-4. **Pour en savoir plus** : `GUIDE_UTILISATION.md`
+| Catégorie | Technologies |
+|-----------|--------------|
+| **Langage** | Python 3.13+ |
+| **Deep Learning** | PyTorch 2.0+ |
+| **Machine Learning** | Scikit-learn, XGBoost |
+| **Traitement Signal** | NeuroKit2, WFDB |
+| **Data Science** | Pandas, NumPy |
+| **Visualisation** | Matplotlib, Seaborn |
 
 ---
 
-## 📊 Résultats Clés
+## 📊 Features Extraites (Wide Branch)
 
-### Dataset en Chiffres
-
-| Métrique | Valeur |
-|----------|--------|
-| **Enregistrements ECG** | 21,799 |
-| **Patients uniques** | 18,869 |
-| **Période** | 1984-2001 (17 ans) |
-| **Diagnostics uniques** | 71 codes SCP |
-| **Score de qualité** | 5.64/6 ⭐ |
-| **Validation humaine** | 73.7% |
-
-### Top 5 Diagnostics
-
-1. **SR** - Sinus Rhythm (76.8%)
-2. **NORM** - Normal ECG (43.6%)
-3. **ABQRS** - Abnormal QRS (15.3%)
-4. **IMI** - Inferior MI (12.3%)
-5. **ASMI** - Anteroseptal MI (10.8%)
-
-### Qualité
-
-- ✅ **85%** des enregistrements ont un score ≥ 5/6
-- ✅ **73.7%** validés par un cardiologue
-- ⚠️ **15%** avec bruit statique
-- ⚠️ **7.3%** avec baseline drift
-
----
-
-## 🎯 Points Forts
-
-| Force | Description |
-|-------|-------------|
-| 🔢 **Taille** | 21,799 ECG - Idéal pour Deep Learning |
-| ✅ **Qualité** | Score 5.64/6 avec validation experte |
-| 🌍 **Diversité** | 71 diagnostics différents |
-| 📊 **Stratification** | 10 folds pour validation croisée |
-| 🎛️ **Multi-fréquence** | 100 Hz et 500 Hz disponibles |
-| 🆓 **Open Source** | Licence permissive ODC-ODbL |
-
----
-
-## ⚠️ Limitations
-
-- **Height** : 68% manquant
-- **Weight** : 57% manquant
-- **Déséquilibre** des classes diagnostiques
-- **Distribution temporelle** non uniforme
-- Quelques **outliers** à corriger (âge = 300 ans)
-
----
-
-## 💡 Applications Recommandées
-
-### Machine Learning
-- ✓ Classification multi-classes des ECG
-- ✓ Détection d'anomalies cardiovasculaires
-- ✓ Prédiction du risque d'infarctus
-- ✓ Clustering de patterns ECG
-
-### Deep Learning
-- ✓ CNN 1D sur signaux bruts
-- ✓ LSTM pour séries temporelles
-- ✓ Transformers avec attention
-- ✓ Transfer learning
-
-### Recherche Médicale
-- ✓ Identification de biomarqueurs
-- ✓ Études épidémiologiques
-- ✓ Validation d'algorithmes
-- ✓ Analyse de survie
-
----
-
-## 📈 Visualisations Générées
-
-### 1. EDA_01_Demographics.png
-![Demographics](EDA_01_Demographics.png)
-- Distribution de l'âge
-- Répartition par sexe
-- Poids, taille, IMC
-
-### 2. EDA_02_Diagnostics.png
-![Diagnostics](EDA_02_Diagnostics.png)
-- Top 15 codes SCP
-- Classes diagnostiques
-- Distribution des codes
-
-### 3. EDA_03_Temporal.png
-![Temporal](EDA_03_Temporal.png)
-- Évolution annuelle
-- Distribution mensuelle
-- Répartition hebdomadaire
-
-### 4. EDA_04_Quality.png
-![Quality](EDA_04_Quality.png)
-- Score de qualité
-- Problèmes de signal
-- Valeurs manquantes
-
-### 5. EDA_05_Technical.png
-![Technical](EDA_05_Technical.png)
-- Sites d'enregistrement
-- Appareils utilisés
-- Stratification des folds
-
----
-
-## 🛠️ Technologies Utilisées
-
-- **Python 3.13+**
-- **pandas** - Manipulation de données
-- **numpy** - Calculs numériques
-- **matplotlib** - Visualisations
-- **seaborn** - Graphiques statistiques
-- **wfdb** - Lecture des signaux ECG
-
----
-
-## 📚 Documentation
-
-| Fichier | Description |
-|---------|-------------|
-| `SYNTHESE_EXECUTIVE.txt` | ⭐ Résumé exécutif (2 pages) |
-| `RESULTATS_ANALYSE.md` | Analyse détaillée complète |
-| `GUIDE_UTILISATION.md` | Guide pratique d'utilisation |
-| `README_EDA.md` | Documentation technique |
-| `INDEX.txt` | Index de tous les fichiers |
-
----
-
-## 🎓 Prochaines Étapes
-
-### Phase 1 : Préparation
-- [ ] Nettoyage des outliers
-- [ ] Imputation des valeurs manquantes
-- [ ] Rééquilibrage des classes
-- [ ] Filtrage par qualité
-
-### Phase 2 : Feature Engineering
-- [ ] Extraction de features temporelles
-- [ ] Calcul de métriques ECG (HRV, QT)
-- [ ] Transformation du signal
-- [ ] Création de features agrégées
-
-### Phase 3 : Modélisation
-- [ ] Baseline Random Forest
-- [ ] XGBoost optimisé
-- [ ] CNN 1D
-- [ ] LSTM/GRU
-- [ ] Ensemble de modèles
-
-### Phase 4 : Production
-- [ ] Validation croisée
-- [ ] Métriques de performance
-- [ ] Interprétabilité (SHAP)
-- [ ] Déploiement API
-
----
-
-## 📞 Support & Aide
-
-### Problèmes Courants
-
-**Q: Erreur d'import de modules**
-```bash
-pip install -r requirements.txt
-```
-
-**Q: Fichiers CSV introuvables**
-Vérifiez que vous êtes dans le bon répertoire
-
-**Q: Manque de mémoire**
-Utilisez `PTB_XL_EDA_Simple.py` au lieu de Professional
-
-**Q: Graphiques ne s'affichent pas**
-Les PNG sont sauvegardés automatiquement
-
----
-
-## 🌟 Fonctionnalités
-
-- ✅ Analyse complète automatisée
-- ✅ Visualisations professionnelles haute résolution
-- ✅ Rapports détaillés multi-formats
-- ✅ Code modulaire et réutilisable
-- ✅ Documentation complète en français
-- ✅ Gestion des erreurs et valeurs manquantes
-- ✅ Style de code PEP 8
-- ✅ Commentaires détaillés
+| # | Feature | Description |
+|---|---------|-------------|
+| 0-1 | HR, RR interval | Fréquence cardiaque |
+| 2-4 | Lead I stats | Mean, Std, Amplitude |
+| 5-7 | Lead II stats | Mean, Std, Amplitude |
+| 8-10 | Lead aVF stats | Mean, Std, Amplitude |
+| 11-13 | Lead V1 stats | Mean, Std, Amplitude |
+| 14-16 | Lead V2 stats | Mean, Std, Amplitude |
+| 17-19 | Lead V3 stats | Mean, Std, Amplitude |
+| 20-31 | HRV features | Variabilité cardiaque |
 
 ---
 
 ## 📖 Références
 
-### Dataset Original
-- **PhysioNet** : https://physionet.org/content/ptb-xl/
-- **Citation** : Wagner et al. (2020), "PTB-XL, a large publicly available electrocardiography dataset"
-- **License** : Open Database License (ODC-ODbL)
-
-### Standards
-- **Codes SCP** : Standard Communication Protocol for ECG
-- **Format** : WFDB (WaveForm DataBase)
-- **Dérivations** : Système 12-lead international
-
----
-
-## ✅ Checklist
-
-- [x] Dataset chargé et exploré
-- [x] Valeurs manquantes analysées
-- [x] Distributions visualisées
-- [x] Qualité évaluée
-- [x] Rapports générés
-- [x] Documentation complète
-- [ ] Nettoyage avancé (à faire)
-- [ ] Feature engineering (à faire)
-- [ ] Modélisation ML (à faire)
-
----
-
-## 🎉 Conclusion
-
-Le dataset PTB-XL est **EXCEPTIONNEL** pour :
-
-- ✅ Développement d'algorithmes d'IA médicale
-- ✅ Recherche en cardiologie computationnelle
-- ✅ Validation de méthodes diagnostiques
-- ✅ Applications cliniques en conditions réelles
-
-**Note Globale** : 9.2/10 ⭐⭐⭐⭐⭐
-
-**Recommandation** : ✅ VALIDÉ POUR PRODUCTION ML
-
----
-
-## 📄 License
-
-Ce projet d'analyse est sous licence MIT.  
-Le dataset PTB-XL est sous licence ODC-ODbL.
+- **Dataset** : [PTB-XL on PhysioNet](https://physionet.org/content/ptb-xl/)
+- **Publication** : Wagner et al. (2020), "PTB-XL, a large publicly available electrocardiography dataset"
+- **License Dataset** : Open Database License (ODC-ODbL)
 
 ---
 
 ## 👨‍💻 Auteur
 
-Développé avec expertise en :
-- 📊 Data Science
-- 🏥 Médecine & Cardiologie
-- 🤖 Machine Learning
-- 📈 Visualisation de données
+**HATIM ABDESSAMAD**
+
+[![GitHub](https://img.shields.io/badge/GitHub-HATIMABDESSAMAD-black.svg)](https://github.com/HATIMABDESSAMAD)
+
+Compétences :
+- 🤖 Deep Learning & Machine Learning
+- 📊 Data Science & Analytics
+- 🏥 IA Médicale (HealthTech)
+- 📈 Traitement du Signal
 
 ---
 
-## 🙏 Remerciements
+## 📄 License
 
-- PhysioNet pour la mise à disposition du dataset
-- Wagner et al. pour la création de PTB-XL
-- La communauté open source
-
----
-
-**Date** : 29 Décembre 2025  
-**Version** : 1.0  
-**Statut** : ✅ Complète et Validée
+Ce projet est sous licence MIT.  
+Le dataset PTB-XL est sous licence ODC-ODbL.
 
 ---
 
 <p align="center">
-  <b>Bonne analyse ! 🚀📊🏥</b>
+  <b>🫀 Classification ECG avec Deep Learning - AUC 92% 🚀</b>
 </p>
